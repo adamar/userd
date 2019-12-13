@@ -1,4 +1,4 @@
-package main
+package userd
 
 import (
 	"bytes"
@@ -43,22 +43,6 @@ var (
 
 // grab the command line arguments and figure out which OS we're on
 func init() {
-	log.SetPrefix("userd v1.19 ")
-	if os.Geteuid() != 0 {
-		log.Fatalf("Error: Bad user id (%d), must run as root", os.Geteuid())
-	}
-
-	flag.StringVar(&realm, "realm", "", "the instance's realm eg: dev, stage, prod")
-	flag.StringVar(&repo, "repo", "", "git repo where users are stored")
-	flag.BoolVar(&debug, "debug", false, "print debugging info")
-	flag.Parse()
-
-	if realm == "" {
-		log.Fatal("Error: Empty argument --realm")
-	}
-	if repo == "" {
-		log.Fatal("Error: Empty argument --repo")
-	}
 
 	v := getOS()
 	if v == "" {
@@ -347,20 +331,4 @@ func inRangePattern(needle string, haystack []string) bool {
 		}
 	}
 	return false
-}
-
-func main() {
-	files := gitClone(repo)
-	users := gatherUsers(files)
-
-	for _, u := range users {
-		if inRangePattern(realm, u.Realms) {
-			if userExists(u.Username) || createUser(u) {
-				removeInvalidGroups(&u, realm)
-				updateUser(u)
-			}
-		} else if userExists(u.Username) {
-			deleteUser(u.Username)
-		}
-	}
 }
