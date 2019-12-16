@@ -1,4 +1,4 @@
-module github.com/adamar/userd
+module userd
 
 require (
 	golang.org/x/tools/gopls v0.1.7 // indirect
